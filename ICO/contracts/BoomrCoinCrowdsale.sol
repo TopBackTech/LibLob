@@ -1,10 +1,5 @@
 pragma solidity ^0.4.18;
 
-//import 'zeppelin-solidity/contracts/ownership/Ownable.sol';
-//import 'zeppelin-solidity/contracts/math/SafeMath.sol';
-//import 'zeppelin-solidity/contracts/crowdsale/RefundVault.sol';
-//import './BoomrCoin.sol';
-
 //*****************************************************
 // BOOMR Coin contract
 // For LibLob, Zach Spoor, by Michael Hanna
@@ -716,7 +711,6 @@ contract BoomrCoinCrowdsale is Ownable{
 
     // emit event for logging
     PresalePurchase(msg.sender, beneficiary, weiAmount);
-
   }
 
   //***************************************************
@@ -746,7 +740,6 @@ contract BoomrCoinCrowdsale is Ownable{
 
     // emit event for logging
     PresaleDistribution(msg.sender, beneficiary, tokensOut);
-
   }
 
   //***************************************************
@@ -823,7 +816,6 @@ contract BoomrCoinCrowdsale is Ownable{
     totalBackers++;
   }
 
-
   // For deposits that do not come thru the contract
   function externalDeposit(address beneficiary, uint256 amount) public onlyOwner{
       require(!isPresaleWaitPhase() && !isCompleted());
@@ -871,5 +863,4 @@ contract BoomrCoinCrowdsale is Ownable{
     finalized = true;
     Finalized();
   }
-
 }
