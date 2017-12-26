@@ -360,8 +360,10 @@ contract BoomrCoinCrowdsale is Ownable{
   // minimum amount of funds to be raised in weis
   uint256 private minGoal = 0;
 
-  // Tokens for presale
+  // maximum amount of funds to be raised in weis
+  uint256 private maxGoal = 0;
 
+  // Tokens for presale
   uint256 private tokenLimitPresale    =  0;
 
   // Tokens for crowdsale
@@ -478,8 +480,12 @@ contract BoomrCoinCrowdsale is Ownable{
     vault = new RefundVault(wallet);
 
     // minimum amount of funds to be raised in weis
-    minGoal = 17500 * 10**18; // Approx 3.5M Dollars
-    //minGoal = 5 * 10**18; // Approx 3.5M Dollars
+    minGoal = 5000 * 10**18; // Approx 3.5M Dollars
+    //minGoal = 1 * 10**18; // testing
+
+    // maximum amount of funds to be raised in weis
+    maxGoal = 28600 * 10**18; // Approx 20M Dollars
+    //maxGoal = 16 * 10**18; // teesting
 
     // Tokens for presale
     tokenLimitPresale    =  30000000 * 10**18;
@@ -497,11 +503,11 @@ contract BoomrCoinCrowdsale is Ownable{
     crowdsaleDiscount4 =           0;  //  0%
 
     // durations for each phase
-    presaleDuration    = 30;//604800; // One Week in seconds
-    crowdsaleDuration1 = 30;//604800; // One Week in seconds
-    crowdsaleDuration2 = 30;//604800; // One Week in seconds
-    crowdsaleDuration3 = 30;//604800; // One Week in seconds
-    crowdsaleDuration4 = 30;//604800; // One Week in seconds
+    presaleDuration    = 604800; // One Week in seconds
+    crowdsaleDuration1 = 604800; // One Week in seconds
+    crowdsaleDuration2 = 604800; // One Week in seconds
+    crowdsaleDuration3 = 604800; // One Week in seconds
+    crowdsaleDuration4 = 604800; // One Week in seconds
 
   }
 
@@ -517,7 +523,8 @@ contract BoomrCoinCrowdsale is Ownable{
                                                           bool crowdsalePhase4,
                                                           bool buyable,
                                                           bool distributable,
-                                                          bool reachedEtherGoal,
+                                                          bool reachedMinimumEtherGoal,
+                                                          bool reachedMaximumEtherGoal,
                                                           bool completed,
                                                           bool finalizedAndClosed,
                                                           bool stopped){
@@ -530,7 +537,8 @@ contract BoomrCoinCrowdsale is Ownable{
               isCrowdsalePhase4(),
               isBuyable(),
               isDistributable(),
-              goalReached(),
+              minGoalReached(),
+              maxGoalReached(),
               isCompleted(),
               finalized,
               halted);
@@ -585,27 +593,27 @@ contract BoomrCoinCrowdsale is Ownable{
   }
 
   function isPresalePhase() internal constant returns (bool){
-    return startTime < now && (startTime + presaleDuration) >= now;
+    return startTime < now && (startTime + presaleDuration) >= now && !maxGoalReached();
   }
 
   function isCrowdsalePhase1() internal constant returns (bool){
-    return (startTime + presaleDuration) < now && (startTime + presaleDuration + crowdsaleDuration1) >= now;
+    return (startTime + presaleDuration) < now && (startTime + presaleDuration + crowdsaleDuration1) >= now && !maxGoalReached();
   }
 
   function isCrowdsalePhase2() internal constant returns (bool){
-    return (startTime + presaleDuration + crowdsaleDuration1) < now && (startTime + presaleDuration + crowdsaleDuration1 + crowdsaleDuration2) >= now;
+    return (startTime + presaleDuration + crowdsaleDuration1) < now && (startTime + presaleDuration + crowdsaleDuration1 + crowdsaleDuration2) >= now && !maxGoalReached();
   }
 
   function isCrowdsalePhase3() internal constant returns (bool){
-    return (startTime + presaleDuration + crowdsaleDuration1 + crowdsaleDuration2) < now && (startTime + presaleDuration + crowdsaleDuration1 + crowdsaleDuration2 + crowdsaleDuration3) >= now;
+    return (startTime + presaleDuration + crowdsaleDuration1 + crowdsaleDuration2) < now && (startTime + presaleDuration + crowdsaleDuration1 + crowdsaleDuration2 + crowdsaleDuration3) >= now && !maxGoalReached();
   }
 
   function isCrowdsalePhase4() internal constant returns (bool){
-    return (startTime + presaleDuration + crowdsaleDuration1 + crowdsaleDuration2 + crowdsaleDuration3) < now && (startTime + presaleDuration + crowdsaleDuration1 + crowdsaleDuration2 + crowdsaleDuration3 + crowdsaleDuration4) >= now;
+    return (startTime + presaleDuration + crowdsaleDuration1 + crowdsaleDuration2 + crowdsaleDuration3) < now && (startTime + presaleDuration + crowdsaleDuration1 + crowdsaleDuration2 + crowdsaleDuration3 + crowdsaleDuration4) >= now && !maxGoalReached();
   }
 
   function isCompleted() internal constant returns (bool){
-    return (startTime + presaleDuration + crowdsaleDuration1 + crowdsaleDuration2 + crowdsaleDuration3 + crowdsaleDuration4) < now;
+    return (startTime + presaleDuration + crowdsaleDuration1 + crowdsaleDuration2 + crowdsaleDuration3 + crowdsaleDuration4) < now || maxGoalReached();
   }
 
   function isDistributable() internal constant returns (bool){
@@ -616,9 +624,13 @@ contract BoomrCoinCrowdsale is Ownable{
     return isDistributable() && !isCompleted();
   }
 
-  // Test if we reached the goal
-  function goalReached() internal constant returns (bool) {
+  // Test if we reached the goals
+  function minGoalReached() internal constant returns (bool) {
     return weiRaised >= minGoal;
+  }
+
+  function maxGoalReached() internal constant returns (bool) {
+    return weiRaised >= maxGoal;
   }
 
   //***************************************************
@@ -686,6 +698,8 @@ contract BoomrCoinCrowdsale is Ownable{
     require(!halted);
     require(beneficiary != 0x0);
     require(deposit != 0);
+    require(isPresalePhase());
+    require(!maxGoalReached());
 
     // Amount invested
     uint256 weiAmount = deposit;
@@ -754,6 +768,7 @@ contract BoomrCoinCrowdsale is Ownable{
     require(beneficiary != 0x0);
     require(deposit != 0);
     require(isCrowdsalePhase1() || isCrowdsalePhase2() || isCrowdsalePhase3() || isCrowdsalePhase4());
+    require(!maxGoalReached());
 
     uint256 price = 0;
 
@@ -843,7 +858,7 @@ contract BoomrCoinCrowdsale is Ownable{
   function claimRefund() public{
     require(!halted);
     require(finalized);
-    require(!goalReached());
+    require(!minGoalReached());
 
     vault.refund(msg.sender);
   }
@@ -854,7 +869,7 @@ contract BoomrCoinCrowdsale is Ownable{
     require(!finalized);
     require(isCompleted());
 
-    if (goalReached()) {
+    if (minGoalReached()) {
       vault.close();
     } else {
       vault.enableRefunds();
