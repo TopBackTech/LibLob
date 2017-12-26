@@ -1,4 +1,4 @@
-//var MetaCoin = artifacts.require("./BoomrCoin.sol");
+var MetaCoin = artifacts.require("./BoomrCoin.sol");
 var Crowdsale = artifacts.require("./BoomrCoinCrowdsale.sol");
 
 contract('Crowdsale', function(accounts) {
@@ -30,10 +30,10 @@ contract('Crowdsale', function(accounts) {
         });
 
     } // waitForTimeStamp()
-  
+
   it("should have phases", function() {
     var liblob;
-    console.log("    Phases: ");    
+    console.log("    Phases: ");
     return Crowdsale.deployed().then(function(instance) {
       liblob = instance;
       return liblob.currentStateActive.call();
@@ -44,15 +44,15 @@ contract('Crowdsale', function(accounts) {
       console.log("    Phase Crowdsale Phase2: " + v[3]);
       console.log("    Phase Crowdsale Phase3: " + v[4]);
       console.log("    Phase Crowdsale Phase4: " + v[5]);
-      console.log("    Phase Crowdsale completed: " + v[6]); 
+      console.log("    Phase Crowdsale completed: " + v[6]);
     });
   });
-  
+
   it("should have a token", function() {
     return Crowdsale.deployed().then(function(instance) {
       return instance.boomrToken.call();
     }).then(function(token) {
-      console.log("    Found token " + token);   
+      console.log("    Found token " + token);
     });
   });
 
@@ -62,16 +62,26 @@ contract('Crowdsale', function(accounts) {
     }).then(function(v) {
       console.log("    Found balance " + v[12] / 1000000000000000000);
       assert.equal(v[12] / 1000000000000000000, 150000000, "350000000 wasn't in the first account");
-            
+
     });
   });
+
+  it("should have token balances for account 0", function() {
+    return MetaCoin.deployed().then(function(instance) {
+      return instance.balanceOf.call(accounts[0]);
+    }).then(function(val) {
+      console.log("    Token Balance 0: " + val);
+    });
+  });
+
+  //return;
 
   it("should wait until duration has passed", () => {
        return Crowdsale.deployed().then( res => {
            var waitLength = 30; // in seconds
            var waitUntil = moment().utc().unix() + waitLength;
            return waitForTimeStamp(waitUntil);
-       }).then( res => { 
+       }).then( res => {
            //done();
        });
    });
@@ -81,7 +91,7 @@ contract('Crowdsale', function(accounts) {
   ///////////////////////////////////////////////////////////////////////
   it("should have phases", function() {
     var liblob;
-    console.log("    Phases: ");    
+    console.log("    Phases: ");
     return Crowdsale.deployed().then(function(instance) {
       liblob = instance;
       return liblob.currentStateActive.call();
@@ -92,16 +102,16 @@ contract('Crowdsale', function(accounts) {
       console.log("    Phase Crowdsale Phase2: " + v[3]);
       console.log("    Phase Crowdsale Phase3: " + v[4]);
       console.log("    Phase Crowdsale Phase4: " + v[5]);
-      console.log("    Phase Crowdsale completed: " + v[6]); 
+      console.log("    Phase Crowdsale completed: " + v[6]);
     });
   });
-  
-  it("should take a presale deposits from 5 people...", function() { 
+
+  it("should take a presale deposits from 5 people...", function() {
     var crowdsale;
     return Crowdsale.deployed().then(function(instance) {
       crowdsale = instance;
       return crowdsale.sendTransaction({value: 2000000000000000000, from: accounts[1]});
-    }).then(function(result) {      
+    }).then(function(result) {
       console.log("    " + result.logs[0].event);
     }).then(function() {
       return crowdsale.sendTransaction({value: 2000000000000000000, from: accounts[2]});
@@ -109,20 +119,20 @@ contract('Crowdsale', function(accounts) {
       console.log("    " + result.logs[0].event);
     }).then(function() {
       return crowdsale.sendTransaction({value: 2000000000000000000, from: accounts[3]});
-    }).then(function(result) {      
+    }).then(function(result) {
       console.log("    " + result.logs[0].event);
     }).then(function() {
       return crowdsale.sendTransaction({value: 2000000000000000000, from: accounts[4]});
-    }).then(function(result) {      
+    }).then(function(result) {
       console.log("    " + result.logs[0].event);
     }).then(function() {
       return crowdsale.sendTransaction({value: 2000000000000000000, from: accounts[5]});
-    }).then(function(result) {      
+    }).then(function(result) {
       console.log("    " + result.logs[0].event);
     });
-  });  
- 
-  it("should FAIL to distribute presale deposits early...", function() { 
+  });
+
+  it("should FAIL to distribute presale deposits early...", function() {
     var crowdsale;
     return Crowdsale.deployed().then(function(instance) {
       crowdsale = instance;
@@ -131,23 +141,23 @@ contract('Crowdsale', function(accounts) {
       console.log("    ->" + error.message);
       assert(error.message.indexOf('invalid opcode') >= 0, 'Expected throw, but got: ' + error);
     });
-  });  
+  });
 
-  it("should have wei raised...", function() { 
+  it("should have wei raised...", function() {
     return Crowdsale.deployed().then(function(instance) {
       return instance.currentStateSales.call();
     }).then(function(v) {
       console.log("    Raised: " + v[9] / 1000000000000000000);
-      assert.equal(v[9] / 1000000000000000000, 10, "Raised amount wrong was: " + v[9]);      
+      assert.equal(v[9] / 1000000000000000000, 10, "Raised amount wrong was: " + v[9]);
     });
   });
 
-  it("should have a prices...", function() { 
+  it("should have a prices...", function() {
     return Crowdsale.deployed().then(function(instance) {
       return instance.currentStateSales.call();
     }).then(function(v) {
       console.log("    Presale Price: " + v[0]);
-      console.log("    Base Price:    " + v[1]);      
+      console.log("    Base Price:    " + v[1]);
       console.log("    CS1 Price:     " + v[2]);
       console.log("    CS2 Price:     " + v[3]);
       console.log("    CS3 Price:     " + v[4]);
@@ -163,7 +173,7 @@ contract('Crowdsale', function(accounts) {
       console.log("    CS1 Tokens Sold:       " + v[1] / 1000000000000000000);
       console.log("    CS2 Tokens Sold:       " + v[2] / 1000000000000000000);
       console.log("    CS3 Tokens Sold:       " + v[3] / 1000000000000000000);
-      console.log("    CS4 Tokens Sold:       " + v[4] / 1000000000000000000);      
+      console.log("    CS4 Tokens Sold:       " + v[4] / 1000000000000000000);
     });
   });
 
@@ -176,14 +186,14 @@ contract('Crowdsale', function(accounts) {
            var waitLength = 30; // in seconds
            var waitUntil = moment().utc().unix() + waitLength;
            return waitForTimeStamp(waitUntil);
-       }).then( res => { 
+       }).then( res => {
            //done();
        });
    });
 
   it("should have phases", function() {
     var liblob;
-    console.log("    Phases: ");    
+    console.log("    Phases: ");
     return Crowdsale.deployed().then(function(instance) {
       liblob = instance;
       return liblob.currentStateActive.call();
@@ -194,23 +204,23 @@ contract('Crowdsale', function(accounts) {
       console.log("    Phase Crowdsale Phase2: " + v[3]);
       console.log("    Phase Crowdsale Phase3: " + v[4]);
       console.log("    Phase Crowdsale Phase4: " + v[5]);
-      console.log("    Phase Crowdsale completed: " + v[6]); 
+      console.log("    Phase Crowdsale completed: " + v[6]);
     });
   });
-    
-  it("should take a purchases from 2 people...", function() { 
+
+  it("should take a purchases from 2 people...", function() {
     var crowdsale;
     return Crowdsale.deployed().then(function(instance) {
       crowdsale = instance;
       return crowdsale.sendTransaction({value: 1000000000000000000, from: accounts[6]});
-    }).then(function(result) {      
+    }).then(function(result) {
       console.log("    " + result.logs[0].event);
     }).then(function() {
       return crowdsale.sendTransaction({value: 1000000000000000000, from: accounts[7]});
-    }).then(function(result) {      
+    }).then(function(result) {
       console.log("    " + result.logs[0].event);
     });
-  });   
+  });
 
     it("should have a token sold count", function() {
     return Crowdsale.deployed().then(function(instance) {
@@ -220,7 +230,7 @@ contract('Crowdsale', function(accounts) {
       console.log("    CS1 Tokens Sold:       " + v[1] / 1000000000000000000);
       console.log("    CS2 Tokens Sold:       " + v[2] / 1000000000000000000);
       console.log("    CS3 Tokens Sold:       " + v[3] / 1000000000000000000);
-      console.log("    CS4 Tokens Sold:       " + v[4] / 1000000000000000000);      
+      console.log("    CS4 Tokens Sold:       " + v[4] / 1000000000000000000);
     });
   });
 
@@ -233,14 +243,14 @@ contract('Crowdsale', function(accounts) {
            var waitLength = 30; // in seconds
            var waitUntil = moment().utc().unix() + waitLength;
            return waitForTimeStamp(waitUntil);
-       }).then( res => { 
+       }).then( res => {
   //         //done();
        });
    });
 
   it("should have phases", function() {
     var liblob;
-    console.log("    Phases: ");    
+    console.log("    Phases: ");
     return Crowdsale.deployed().then(function(instance) {
       liblob = instance;
       return liblob.currentStateActive.call();
@@ -251,23 +261,23 @@ contract('Crowdsale', function(accounts) {
       console.log("    Phase Crowdsale Phase2: " + v[3]);
       console.log("    Phase Crowdsale Phase3: " + v[4]);
       console.log("    Phase Crowdsale Phase4: " + v[5]);
-      console.log("    Phase Crowdsale completed: " + v[6]); 
+      console.log("    Phase Crowdsale completed: " + v[6]);
     });
   });
-    
-  it("should take a purchases from 2 people...", function() { 
+
+  it("should take a purchases from 2 people...", function() {
     var crowdsale;
     return Crowdsale.deployed().then(function(instance) {
       crowdsale = instance;
       return crowdsale.sendTransaction({value: 1000000000000000000, from: accounts[8]});
-    }).then(function(result) {      
+    }).then(function(result) {
       console.log("    " + result.logs[0].event);
     }).then(function() {
       return crowdsale.sendTransaction({value: 1000000000000000000, from: accounts[9]});
-    }).then(function(result) {      
+    }).then(function(result) {
       console.log("    " + result.logs[0].event);
     });
-  });   
+  });
 
     it("should have a token sold count", function() {
     return Crowdsale.deployed().then(function(instance) {
@@ -277,7 +287,7 @@ contract('Crowdsale', function(accounts) {
       console.log("    CS1 Tokens Sold:       " + v[1] / 1000000000000000000);
       console.log("    CS2 Tokens Sold:       " + v[2] / 1000000000000000000);
       console.log("    CS3 Tokens Sold:       " + v[3] / 1000000000000000000);
-      console.log("    CS4 Tokens Sold:       " + v[4] / 1000000000000000000);      
+      console.log("    CS4 Tokens Sold:       " + v[4] / 1000000000000000000);
     });
   });
 
@@ -290,14 +300,14 @@ contract('Crowdsale', function(accounts) {
            var waitLength = 30; // in seconds
            var waitUntil = moment().utc().unix() + waitLength;
            return waitForTimeStamp(waitUntil);
-       }).then( res => { 
+       }).then( res => {
   //         //done();
        });
    });
 
   it("should have phases", function() {
     var liblob;
-    console.log("    Phases: ");    
+    console.log("    Phases: ");
     return Crowdsale.deployed().then(function(instance) {
       liblob = instance;
       return liblob.currentStateActive.call();
@@ -308,23 +318,23 @@ contract('Crowdsale', function(accounts) {
       console.log("    Phase Crowdsale Phase2: " + v[3]);
       console.log("    Phase Crowdsale Phase3: " + v[4]);
       console.log("    Phase Crowdsale Phase4: " + v[5]);
-      console.log("    Phase Crowdsale completed: " + v[6]); 
+      console.log("    Phase Crowdsale completed: " + v[6]);
     });
   });
-    
-  it("should take a purchases from 2 people...", function() { 
+
+  it("should take a purchases from 2 people...", function() {
     var crowdsale;
     return Crowdsale.deployed().then(function(instance) {
       crowdsale = instance;
       return crowdsale.sendTransaction({value: 1000000000000000000, from: accounts[8]});
-    }).then(function(result) {      
+    }).then(function(result) {
       console.log("    " + result.logs[0].event);
     }).then(function() {
       return crowdsale.sendTransaction({value: 1000000000000000000, from: accounts[9]});
-    }).then(function(result) {      
+    }).then(function(result) {
       console.log("    " + result.logs[0].event);
     });
-  });   
+  });
 
     it("should have a token sold count", function() {
     return Crowdsale.deployed().then(function(instance) {
@@ -334,7 +344,7 @@ contract('Crowdsale', function(accounts) {
       console.log("    CS1 Tokens Sold:       " + v[1] / 1000000000000000000);
       console.log("    CS2 Tokens Sold:       " + v[2] / 1000000000000000000);
       console.log("    CS3 Tokens Sold:       " + v[3] / 1000000000000000000);
-      console.log("    CS4 Tokens Sold:       " + v[4] / 1000000000000000000);      
+      console.log("    CS4 Tokens Sold:       " + v[4] / 1000000000000000000);
     });
   });
 
@@ -347,14 +357,14 @@ contract('Crowdsale', function(accounts) {
            var waitLength = 30; // in seconds
            var waitUntil = moment().utc().unix() + waitLength;
            return waitForTimeStamp(waitUntil);
-       }).then( res => { 
+       }).then( res => {
            //done();
        });
    });
 
   it("should have phases", function() {
     var liblob;
-    console.log("    Phases: ");    
+    console.log("    Phases: ");
     return Crowdsale.deployed().then(function(instance) {
       liblob = instance;
       return liblob.currentStateActive.call();
@@ -365,33 +375,33 @@ contract('Crowdsale', function(accounts) {
       console.log("    Phase Crowdsale Phase2: " + v[3]);
       console.log("    Phase Crowdsale Phase3: " + v[4]);
       console.log("    Phase Crowdsale Phase4: " + v[5]);
-      console.log("    Phase Crowdsale completed: " + v[6]); 
+      console.log("    Phase Crowdsale completed: " + v[6]);
     });
   });
-    
-  it("should take a purchases from 2 people...", function() { 
+
+  it("should take a purchases from 2 people...", function() {
     var crowdsale;
     return Crowdsale.deployed().then(function(instance) {
       crowdsale = instance;
       return crowdsale.sendTransaction({value: 1000000000000000000, from: accounts[6]});
-    }).then(function(result) {      
+    }).then(function(result) {
       console.log("    " + result.logs[0].event);
     }).then(function() {
       return crowdsale.sendTransaction({value: 1000000000000000000, from: accounts[7]});
-    }).then(function(result) {      
+    }).then(function(result) {
       console.log("    " + result.logs[0].event);
     });
-  });   
+  });
 
   it("should have a token sold count", function() {
     return Crowdsale.deployed().then(function(instance) {
       return instance.currentTokenDistribution.call();
-    }).then(function(v) {      
+    }).then(function(v) {
       console.log("    Presale Tokens Sold:   " + v[0] / 1000000000000000000);
       console.log("    CS1 Tokens Sold:       " + v[1] / 1000000000000000000);
       console.log("    CS2 Tokens Sold:       " + v[2] / 1000000000000000000);
       console.log("    CS3 Tokens Sold:       " + v[3] / 1000000000000000000);
-      console.log("    CS4 Tokens Sold:       " + v[4] / 1000000000000000000);      
+      console.log("    CS4 Tokens Sold:       " + v[4] / 1000000000000000000);
     });
   });
 
@@ -399,7 +409,7 @@ contract('Crowdsale', function(accounts) {
   //  distribution
   ///////////////////////////////////////////////////////////////////////
 
-  it("should distribute presale deposits from 5 people...", function() { 
+  it("should distribute presale deposits from 5 people...", function() {
     var crowdsale;
     return Crowdsale.deployed().then(function(instance) {
       crowdsale = instance;
@@ -423,7 +433,7 @@ contract('Crowdsale', function(accounts) {
     }).then(function(result) {
       console.log("    " + result.logs[0].event);
     });
-  });  
+  });
 
     it("should have a token sold count", function() {
     return Crowdsale.deployed().then(function(instance) {
@@ -433,7 +443,7 @@ contract('Crowdsale', function(accounts) {
       console.log("    CS1 Tokens Sold:       " + v[1] / 1000000000000000000);
       console.log("    CS2 Tokens Sold:       " + v[2] / 1000000000000000000);
       console.log("    CS3 Tokens Sold:       " + v[3] / 1000000000000000000);
-      console.log("    CS4 Tokens Sold:       " + v[4] / 1000000000000000000);      
+      console.log("    CS4 Tokens Sold:       " + v[4] / 1000000000000000000);
     });
   });
 
@@ -442,14 +452,14 @@ contract('Crowdsale', function(accounts) {
            var waitLength = 30; // in seconds
            var waitUntil = moment().utc().unix() + waitLength;
            return waitForTimeStamp(waitUntil);
-       }).then( res => { 
+       }).then( res => {
            //done();
        });
    });
 
   it("should have phases", function() {
     var liblob;
-    console.log("    Phases: ");    
+    console.log("    Phases: ");
     return Crowdsale.deployed().then(function(instance) {
       liblob = instance;
       return liblob.currentStateActive.call();
@@ -460,11 +470,11 @@ contract('Crowdsale', function(accounts) {
       console.log("    Phase Crowdsale Phase2: " + v[3]);
       console.log("    Phase Crowdsale Phase3: " + v[4]);
       console.log("    Phase Crowdsale Phase4: " + v[5]);
-      console.log("    Phase Crowdsale completed: " + v[6]); 
+      console.log("    Phase Crowdsale completed: " + v[6]);
     });
   });
 
-  it("should FAIL to purchase...", function() { 
+  it("should FAIL to purchase...", function() {
     var crowdsale;
     return Crowdsale.deployed().then(function(instance) {
       crowdsale = instance;
@@ -473,7 +483,7 @@ contract('Crowdsale', function(accounts) {
       console.log("    ->" + error.message);
       assert(error.message.indexOf('invalid opcode') >= 0, 'Expected throw, but got: ' + error);
     });
-  }); 
+  });
 
   it("should be under goal.", function() {
     var liblob;
@@ -531,5 +541,47 @@ contract('Crowdsale', function(accounts) {
       console.log("    Refund: " + result[0]);
     });
   });
+
+
+  it("should have token balances for account 0", function() {
+    return MetaCoin.deployed().then(function(instance) {
+      return instance.balanceOf.call(accounts[0]);
+    }).then(function(val) {
+      console.log("    Token Balance 0: " + val);
+    });
+  });
+
+  it("should have token balances for account 1", function() {
+    return MetaCoin.deployed().then(function(instance) {
+      return instance.balanceOf.call(accounts[1]);
+    }).then(function(val) {
+      console.log("    Token Balance 1: " + val);
+    });
+  });
+
+  it("should have token balances for account 2", function() {
+    return MetaCoin.deployed().then(function(instance) {
+      return instance.balanceOf.call(accounts[2]);
+    }).then(function(val) {
+      console.log("    Token Balance 2: " + val);
+    });
+  });
+
+  it("should have token balances for account 8", function() {
+    return MetaCoin.deployed().then(function(instance) {
+      return instance.balanceOf.call(accounts[8]);
+    }).then(function(val) {
+      console.log("    Token Balance 8: " + val);
+    });
+  });
+
+  it("should have token balances for account 9", function() {
+    return MetaCoin.deployed().then(function(instance) {
+      return instance.balanceOf.call(accounts[9]);
+    }).then(function(val) {
+      console.log("    Token Balance 9: " + val);
+    });
+  });
+
 
 });
